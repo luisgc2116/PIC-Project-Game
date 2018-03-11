@@ -7,7 +7,7 @@ import random
 pygame.init()
 
 
-class FlappyBird(object):
+class FlappyBird(pygame.sprite.Sprite):
     '''
 
 
@@ -17,23 +17,37 @@ class FlappyBird(object):
         self.width = 470 #640 508
         self.height = 680
         self.screen = pygame.display.set_mode((self.width, self.height)) #width, height
+        pygame.sprite.Sprite.__init__(self)
 
         self.background = pygame.image.load("/Users/ULT19/Downloads/PIC-Project-Game-master/background2.png").convert()
         self.background_homescreen = pygame.image.load("/Users/ULT19/Downloads/PIC-Project-Game-master/Flappy Bird-878531.png").convert()
-        self.birdSprites = [pygame.image.load("/Users/ULT19/Downloads/PIC-Project-Game-master/1.png").convert_alpha(),
+        self.birdSprites2 = [pygame.image.load("/Users/ULT19/Downloads/PIC-Project-Game-master/f1.png").convert_alpha(),
+                            pygame.image.load("/Users/ULT19/Downloads/PIC-Project-Game-master/f2.png").convert_alpha(),
+                            pygame.image.load("/Users/ULT19/Downloads/PIC-Project-Game-master/f3.png")]
+
+        self.birdSprites1 = [pygame.image.load("/Users/ULT19/Downloads/PIC-Project-Game-master/1.png").convert_alpha(),
                             pygame.image.load("/Users/ULT19/Downloads/PIC-Project-Game-master/2.png").convert_alpha(),
                             pygame.image.load("/Users/ULT19/Downloads/PIC-Project-Game-master/dead.png")]
+
+        self.size = self.birdSprites2[0].get_size()
+        n = 11
+        self.birdSprites_scale = [pygame.transform.scale(self.birdSprites2[0], (int(self.size[0]/n), int(self.size[1]/n))),
+            pygame.transform.scale(self.birdSprites2[1], (int(self.size[0]/n), int(self.size[1]/n))),
+            pygame.transform.scale(self.birdSprites2[2], (int(self.size[0]/n), int(self.size[1]/n)))]
+        self.birdSprites = [0,0,0]
+
+
         self.wallUp = pygame.image.load("/Users/ULT19/Downloads/PIC-Project-Game-master/bottom.png").convert_alpha()
         self.wallDown = pygame.image.load("/Users/ULT19/Downloads/PIC-Project-Game-master/top.png").convert_alpha()
 
         #Environment/Character characteristics
         self.bird = pygame.Rect(65, 50, 50, 50) #hit-box
-        self.pipe_gap = 130
+        self.pipe_gap = 160
         self.wallx = self.width
         self.bird_y_pos = 350 #start position of bird
         self.jump = 0
         self.jumpSpeed = 10
-        self.gravity = 5
+        self.gravity = 4
 
         #Sprites
         self.sprite = 0
@@ -55,7 +69,7 @@ class FlappyBird(object):
 
     def click_objects(self,text, font):
         '''
-        Creates suface where a click follows any action given 
+        Creates suface where a click follows any action given
         '''
         textSurface = font.render(text, True, self.black)
         return textSurface, textSurface.get_rect()
@@ -71,12 +85,34 @@ class FlappyBird(object):
         if x+w > mouse[0] > x and y+h > mouse[1] > y:
             if click[0] == 1 and action != None:
                 action()
+    def button2(self, msg,x,y,w,h,ic,ac,action=None):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
 
-    def quitgame(self,):
+        if x+w > mouse[0] > x and y+h > mouse[1] > y:
+            pygame.draw.rect(self.screen, ac,(x,y,w,h))
+
+            if click[0] == 1 and action != None:
+                action()
+        else:
+            pygame.draw.rect(self.screen, ic,(x,y,w,h))
+
+        smallText = pygame.font.SysFont("Times New Roman",20)
+        textSurf, textRect = self.click_objects(msg, smallText)
+        textRect.center = ( (x+(w/2)), (y+(h/2)) )
+        self.screen.blit(textSurf, textRect)
+
+    def quitgame(self):
         pygame.quit()
         quit()
 
-    def game_intro(self,):
+    def bird2(self):
+        self.pipe_gap = 160
+        self.gravity = 5
+        self.birdSprites1 = self.birdSprites_scale
+        self.game()
+
+    def game_intro(self):
 
         intro = True
 
@@ -89,20 +125,22 @@ class FlappyBird(object):
 
             self.screen.fill(self.white)
             self.screen.blit(self.background_homescreen, (0, 0))
+            self.screen.blit(self.birdSprites_scale[0], (int(self.width/2)+80,280))
             largeText = pygame.font.Font('freesansbold.ttf',40)
             TextSurf, TextRect = self.click_objects("Flappy Bird", largeText)
             TextRect.center = ((self.width/2),(self.height/4))
             #self.screen.blit(TextSurf, TextRect)
 
-            self.button(95,375,280,50,self.light_red,self.game)
-            #self.button("Quit",150,550,100,50,self.block_color,self.bright_green,self.quitgame)
-
+            #self.button(95,375,280,50,self.light_red,self.game)
+            self.button(95,375,100,50,self.light_red,self.game)
+            self.button(270,375,100,50,self.light_red,self.bird2)
+            self.button2("Quit",int(self.width/2)+150,620,100,50,self.white,self.light_red,self.quitgame)
 
             pygame.display.update()
             self.clock.tick(60)
 
     def updateWalls(self):
-        self.wallx -= 2
+        self.wallx -= 2 + self.points_counter//2
         if self.wallx < -80:
             self.wallx = self.width #resets
             self.points_counter += 1
@@ -169,13 +207,13 @@ class FlappyBird(object):
                 self.sprite = 2
             elif self.jump:
                 self.sprite = 1
-            self.screen.blit(self.birdSprites[self.sprite], (70, self.bird_y_pos))
+            self.screen.blit(self.birdSprites1[self.sprite], (70, self.bird_y_pos))
             if not self.dead:
                 self.sprite = 0
-
 
             self.updateWalls()
             self.birdUpdate()
             pygame.display.update()
+
 if __name__ == "__main__":
     FlappyBird().game_intro()
