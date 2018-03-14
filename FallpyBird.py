@@ -69,7 +69,7 @@ class FlappyBird(pygame.sprite.Sprite):
 
     def click_objects(self,text, font):
         '''
-        Creates suface where a click follows any action given
+        Creates a clickable surface with text.
         '''
         textSurface = font.render(text, True, self.black)
         return textSurface, textSurface.get_rect()
@@ -77,7 +77,7 @@ class FlappyBird(pygame.sprite.Sprite):
 
     def button(self,x,y,w,h,ac,action=None):
         '''
-        Creates suface where a click follows any action given
+        Creates action on clickable surface.
         '''
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
@@ -87,6 +87,9 @@ class FlappyBird(pygame.sprite.Sprite):
                 action()
 
     def button2(self, msg,x,y,w,h,ic,ac,action=None):
+        '''
+        Creates a button with both clickable surface and text centered
+        '''
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
@@ -104,6 +107,7 @@ class FlappyBird(pygame.sprite.Sprite):
         self.screen.blit(textSurf, textRect)
 
     def quitgame(self):
+        #Quits game smoothely with no errors
         pygame.quit()
         quit()
 
@@ -115,12 +119,19 @@ class FlappyBird(pygame.sprite.Sprite):
         os.execl(python, python, * sys.argv)
 
     def bird2(self):
+        '''
+        Attributes when selecting second bird
+        '''
         self.pipe_gap = 180
         self.gravity = 5
         self.birdSprites1 = self.birdSprites_scale
         self.game()
 
     def game_intro(self):
+        '''
+        Sets intro screen for the game.
+
+        '''
 
         intro = True
 
@@ -133,22 +144,25 @@ class FlappyBird(pygame.sprite.Sprite):
             self.screen.fill(self.white)
             self.screen.blit(self.background_homescreen, (0, 0))
             self.screen.blit(self.birdSprites_scale[0], (int(self.width/2)+80,280))
-            largeText = pygame.font.Font('freesansbold.ttf',40)
-            TextSurf, TextRect = self.click_objects("Flappy Bird", largeText)
-            TextRect.center = ((self.width/2),(self.height/4))
-            #self.screen.blit(TextSurf, TextRect)
 
-            #self.button(95,375,280,50,self.light_red,self.game)
-            self.button(95,375,100,50,self.light_red,self.game)
-            self.button(270,375,100,50,self.light_red,self.bird2)
+            largeText = pygame.font.SysFont("Times New Roman",20)
+            TextSurf, TextRect = self.click_objects("Click on bird", largeText)
+            self.screen.blit(TextSurf, (170, 160))
+
+            self.button(95,275,100,150,self.light_red,self.game)
+            self.button(270,275,100,150,self.light_red,self.bird2)
+
             self.button2("Quit",int(self.width/2)+150,620,100,50,self.white,self.light_red,self.quitgame)
 
             pygame.display.update()
             self.clock.tick(60)
 
     def updateWalls(self):
+        '''
+        Updates walls accordingly.
+        '''
         self.wallx -= 2 + self.points_counter//2
-        if self.points_counter == 2:
+        if self.points_counter == 5:
             self.background = self.background1
         if self.points_counter == 4:
             self.background = self.background1
@@ -160,6 +174,9 @@ class FlappyBird(pygame.sprite.Sprite):
             self.offset = random.randint(-140, 140)
 
     def birdUpdate(self):
+        '''
+        Updates the movement of the bird
+        '''
         if self.jump:
             self.jumpSpeed -= 1
             self.bird_y_pos -= self.jumpSpeed
@@ -191,6 +208,9 @@ class FlappyBird(pygame.sprite.Sprite):
             self.gravity = 5
 
     def game(self):
+        '''
+        Runs the parameters for pygame to initialize the game display
+        '''
         clock = pygame.time.Clock()
         pygame.font.init()
         font = pygame.font.SysFont("Arial", 50)
@@ -213,7 +233,15 @@ class FlappyBird(pygame.sprite.Sprite):
             self.screen.blit(self.wallDown,
                              (self.wallx, 0 - self.pipe_gap - self.offset))
             self.screen.blit(font.render(str(self.points_counter),-1,self.white),(self.width/2, 50))
-            self.button2("Quit",int(self.width/2)+150,620,100,50,self.white,self.light_red,self.restart_program)
+
+
+
+            largeText = pygame.font.SysFont("Times New Roman",20)
+            TextSurf, TextRect = self.click_objects("Home", largeText)
+            self.screen.blit(TextSurf, (int(self.width/2)+150,620))
+            self.button(int(self.width/2)+150,620,100,50,self.light_red,self.restart_program)
+
+            #self.button2("Home",int(self.width/2)+150,620,100,50,self.white,self.light_red,self.restart_program)
 
 
             #Sprites
@@ -232,3 +260,6 @@ class FlappyBird(pygame.sprite.Sprite):
 
 if __name__ == "__main__":
     FlappyBird().game_intro()
+
+
+
