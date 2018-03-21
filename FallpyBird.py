@@ -10,7 +10,12 @@ pygame.init()
 
 class FlappyBird(pygame.sprite.Sprite):
     '''
+    This is the finished product of the PIC 16 final project. 
 
+
+    The main, essential portion of the project lies in the "run" function, giving the structure for each frame, while the preceding
+    functions act as the "physics" for the game. Further optimizations are made by these preceding functions that control the 
+    player's updated speed and momentum.
 
     '''
     def __init__(self):
